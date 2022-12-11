@@ -28,7 +28,21 @@ const fs = require('fs');
 // console.log('Read file success'); const http = require('http); const url = require('url)
 
 //Server_________________________________
+const replaceTemplate = (temp, product) => {
+  let output = temp.replace(/{%PRODUCTNAME%}/g, product.productName);
+  output = output.replace(/{%IMAGE%}/g, product.image);
+  output = output.replace(/{%PRICE%}/g, product.price);
+  output = output.replace(/{%FROM%}/g, product.from);
+  output = output.replace(/{%NUTRIENTS%}/g, product.nutrients);
+  output = output.replace(/{%QUANTITY%}/g, product.quantity);
+  output = output.replace(/{%DESCRIPTION%}/g, product.description);
+  output = output.replace(/{%ID%}/g, product.id);
+  if (!product.organic) {
+    output = output.replace(/{%ORGANIC%}/g, 'not-organic');
+  }
 
+  return output;
+};
 const tempOverview = fs.readFileSync(
   `${__dirname}/templates/template-overview.html`,
   'utf-8'
@@ -38,10 +52,11 @@ const tempCard = fs.readFileSync(
   'utf-8'
 );
 const tempProducts = fs.readFileSync(
-  `${__dirname}/templates/template-products.html`,
+  `${__dirname}/templates/template-product.html`,
   'utf-8'
 );
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
   const path = req.url;
@@ -49,7 +64,13 @@ const server = http.createServer((req, res) => {
   switch (path) {
     case '/' || '/overview':
       res.writeHead(200, { 'Content-type': 'text/html' });
-      res.end(tempOverview);
+
+      const cards = dataObj
+        .map((card) => replaceTemplate(tempCard, card))
+        .join('');
+      //console.log(cards);
+      const results = tempOverview.replace('{%PRODUCT_CARDS%}', cards);
+      res.end(results);
       break;
     case '/products':
       res.end('Path for Home || Overview');
