@@ -25,36 +25,42 @@ const fs = require('fs');
 //     });
 //   });
 // });
-// console.log('Read file success'); const http = require('http') const = url = require('url')
+// console.log('Read file success'); const http = require('http); const url = require('url)
 
 //Server_________________________________
+
+const tempOverview = fs.readFileSync(
+  `${__dirname}/templates/template-overview.html`,
+  'utf-8'
+);
+const tempCard = fs.readFileSync(
+  `${__dirname}/templates/template-card.html`,
+  'utf-8'
+);
+const tempProducts = fs.readFileSync(
+  `${__dirname}/templates/template-products.html`,
+  'utf-8'
+);
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
-const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
   const path = req.url;
+
   switch (path) {
     case '/' || '/overview':
-      res.end('Path for OVERVIEW || HOME');
+      res.writeHead(200, { 'Content-type': 'text/html' });
+      res.end(tempOverview);
       break;
     case '/products':
-      res.end('Path for PRODUCTS');
+      res.end('Path for Home || Overview');
       break;
     case '/api':
       res.writeHead(200, { 'Content-type': 'application/json' });
       res.end(data);
-      //   fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
-      //     //const prodData = JSON.parse(data);
-      //     //console.log(prodData);
-      //     res.writeHead(200, { 'Content-type': 'application/json' });
-      //     res.end(data);
-      //   });
       break;
 
     default:
-      res.writeHead(404, {
-        'Content-type': 'text/html',
-      });
+      res.writeHead(404, { 'Content-type': 'text/html' });
       res.end('<h1>404: Page Not Found</h1>');
       break;
   }
