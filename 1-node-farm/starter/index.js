@@ -40,6 +40,7 @@ const replaceTemplate = (temp, product) => {
 
   if (!product.organic)
     output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic');
+
   return output;
 };
 const tempOverview = fs.readFileSync(
@@ -58,27 +59,38 @@ const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
-  const path = req.url;
+  const { query, pathname } = url.parse(req.url, true);
+  //console.log(query, pathname);
 
-  switch (path) {
-    case '/' || '/overview':
+  switch (pathname) {
+    //Overview
+    case '/':
       res.writeHead(200, { 'Content-type': 'text/html' });
 
       const cards = dataObj
         .map((card) => replaceTemplate(tempCard, card))
         .join('');
-      //console.log(cards);
       const results = tempOverview.replace('{%PRODUCT_CARDS%}', cards);
+
       res.end(results);
       break;
+
+    //Products
     case '/products':
-      res.end('Path for Home || Overview');
+      res.writeHead(200, { 'Content-type': 'text/html' });
+      const product = dataObj[query.id];
+      const output = replaceTemplate(tempProducts, product);
+      res.end(output);
+      //console.log(query);
       break;
+
+    //API
     case '/api':
       res.writeHead(200, { 'Content-type': 'application/json' });
       res.end(data);
       break;
 
+    //NOT FOUND
     default:
       res.writeHead(404, { 'Content-type': 'text/html' });
       res.end('<h1>404: Page Not Found</h1>');
