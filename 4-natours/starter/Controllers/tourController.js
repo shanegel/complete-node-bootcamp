@@ -5,6 +5,30 @@ const tours = JSON.parse(
 );
 
 //Route Handlers
+
+//ID Checker-----------------------------------------------------
+exports.checkID = (req, res, next, val) => {
+  console.log(`Id is: ${val}`);
+  const id = +req.params.id;
+  const tour = tours.find((el) => el.id === id);
+  if (!tour) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'ERR:: => PATCH FAIL:: => Invalid ID',
+    });
+  }
+  next();
+};
+//Req Body Checker-----------------------------------------------------
+exports.bodyChecker = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'ERR:: => GET FAIL:: => Invalid Request Body',
+    });
+  }
+  next();
+};
 //GET All-----------------------------------------------------
 exports.getAllTours = (req, res) => {
   res.status(200).json({
@@ -20,16 +44,10 @@ exports.getAllTours = (req, res) => {
 exports.getSingleTour = (req, res) => {
   const id = +req.params.id;
   const tour = tours.find((el) => el.id === id);
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'ERR:: => GET FAIL:: => Invalid ID',
-    });
-  }
   res.status(200).json({
     status: 'success',
     data: {
-      tour: tour,
+      tour,
     },
   });
 };
@@ -41,7 +59,7 @@ exports.addTour = (req, res) => {
   tours.push(newTour);
 
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     (err) => {
       if (err) {
@@ -61,14 +79,6 @@ exports.addTour = (req, res) => {
 };
 //PATCH-----------------------------------------------------
 exports.editTour = (req, res) => {
-  const id = +req.params.id;
-  const tour = tours.find((el) => el.id === id);
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'ERR:: => PATCH FAIL:: => Invalid ID',
-    });
-  }
   res.status(202).json({
     status: 'success',
     message: '<=SUCCESS=>',
@@ -76,14 +86,6 @@ exports.editTour = (req, res) => {
 };
 //DELETE-----------------------------------------------------
 exports.deleteTour = (req, res) => {
-  const id = +req.params.id;
-  const tour = tours.find((el) => el.id === id);
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'ERR:: => DELETE FAIL:: => Invalid ID',
-    });
-  }
   res.status(202).json({
     status: 'success',
     message: '<=SUCCESS=>',
