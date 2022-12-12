@@ -6,6 +6,12 @@ const { getAllTours, addTour, getSingleTour, editTour, deleteTour } =
 //ROUTER
 const router = express.Router();
 //ROUTES
+
+// app.get('/api/v1/tours', getAllTours);
+// app.post('/api/v1/tours', addTour);
+// app.get('/api/v1/tours/:id', getSingleTour);
+// app.patch('/api/v1/tours/:id', editTour);
+
 router.route('/').get(getAllTours).post(addTour);
 router.route('/:id').get(getSingleTour).patch(editTour).delete(deleteTour);
 
