@@ -28,5 +28,6 @@ readFilePromise(`${__dirname}/dog.txt`)
   .then((res) => {
     console.log(res.body.message);
     return writeFilePromise('dog-images.txt', res.body.message);
+    console.log('Link saved to file');
   })
   .catch((err) => console.log(err));
