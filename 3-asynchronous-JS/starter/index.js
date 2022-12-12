@@ -14,6 +14,7 @@ const readFilePromise = (file) => {
 const writeFilePromise = (file, data) => {
   //Executer
   return new Promise((resolve, reject) => {
+    //Process
     fs.writeFile(file, data, (err) => {
       if (err) reject('Cannot read file.');
       resolve('Success');
@@ -22,16 +23,30 @@ const writeFilePromise = (file, data) => {
 };
 
 const getDog = async () => {
-  const data = await readFilePromise(`${__dirname}/dog.txt`);
-  console.log(`Breed: ${data}`);
-  const img = await superagent.get(
-    `https://dog.ceo/api/breed/${data}/images/random`
-  );
-  console.log(img.body.message);
-  const url = img.body.message;
-  await writeFilePromise('dog-images.txt', url, () =>
-    console.log('Link saved to file')
-  );
+  try {
+    const data = await readFilePromise(`${__dirname}/dog.txt`);
+    //console.log(`Breed: ${data}`);
+    const img1 = superagent.get(
+      `https://dog.ceo/api/breed/${data}/images/random`
+    );
+    const img2 = superagent.get(
+      `https://dog.ceo/api/breed/${data}/images/random`
+    );
+    const img3 = superagent.get(
+      `https://dog.ceo/api/breed/${data}/images/random`
+    );
+
+    const imgs = await Promise.all([img1, img2, img3]);
+    const images = imgs.map((el) => el.body.message);
+    console.log(images);
+    //console.log(img.body.message);
+    //const urls = images;
+    await writeFilePromise('dog-images.txt', images.join('\n'), () =>
+      console.log('Link saved to file')
+    );
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 getDog();
