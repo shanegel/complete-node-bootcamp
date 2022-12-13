@@ -16,17 +16,27 @@ exports.getAllTours = async (req, res) => {
     //console.log(queryObj);
 
     //BUILD ADVANCE QUERY
-
     let advQuery = JSON.stringify(queryObj);
     advQuery = advQuery.replace(/\b(gte|lte|gt|lt)\b/g, (match) => `$${match}`);
     const result = JSON.parse(advQuery);
+
+    //STORE QUERY
+    let query = Tour.find(result);
+
+    //CHECK FOR QUERY CHANGE
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+
     //EXECUTE QUERY
-    const query = Tour.find(result);
     const tours = await query;
 
     res.status(200).json({
       status: 'success',
-      results: tours.length,
+      length: tours.length,
       data: {
         tours,
       },
