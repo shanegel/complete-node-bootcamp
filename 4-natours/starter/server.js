@@ -9,7 +9,10 @@ const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.PASSWORD);
 const app = require('./app');
 
 mongoose.set('strictQuery', true);
-mongoose.connect(DB).then(() => console.log('DB Connection Established'));
+mongoose
+  .connect(DB)
+  .then(() => console.log('DB Connection Established'))
+  .catch((err) => console.log(err));
 
 const tourSchema = new mongoose.Schema({
   name: {
