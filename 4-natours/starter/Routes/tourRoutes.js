@@ -1,6 +1,7 @@
 const express = require('express');
 const tourController = require('../Controllers/tourController');
 
+//Controllers
 const {
   //checkID,
   //bodyChecker,
@@ -11,6 +12,8 @@ const {
   getSingleTour,
   editTour,
   deleteTour,
+  getTourStats,
+  getMothlyPlan,
 } = tourController;
 
 //ROUTER
@@ -26,6 +29,9 @@ const router = express.Router();
 
 router.route('/top-5-cheap-tours').get(cheap5Tours, getAllTours);
 router.route('/easy-tours').get(easyTours, getAllTours);
+
+router.route('/tour-stats').get(getTourStats);
+router.route('/monthly-plan/:year').get(getMothlyPlan);
 
 router.route('/').get(getAllTours).post(addTour);
 router.route('/:id').get(getSingleTour).patch(editTour).delete(deleteTour);
