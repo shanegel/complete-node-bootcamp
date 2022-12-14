@@ -4,6 +4,8 @@ const tourController = require('../Controllers/tourController');
 const {
   //checkID,
   //bodyChecker,
+  easyTours,
+  cheap5Tours,
   getAllTours,
   addTour,
   getSingleTour,
@@ -14,12 +16,16 @@ const {
 //ROUTER
 const router = express.Router();
 
-// router.param('id', checkID);
 //ROUTES
 // app.get('/api/v1/tours', getAllTours);
 // app.post('/api/v1/tours', addTour);
 // app.get('/api/v1/tours/:id', getSingleTour);
 // app.patch('/api/v1/tours/:id', editTour);
+
+// router.param('id', checkID);
+
+router.route('/top-5-cheap-tours').get(cheap5Tours, getAllTours);
+router.route('/easy-tours').get(easyTours, getAllTours);
 
 router.route('/').get(getAllTours).post(addTour);
 router.route('/:id').get(getSingleTour).patch(editTour).delete(deleteTour);

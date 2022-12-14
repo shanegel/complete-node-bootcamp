@@ -1,38 +1,88 @@
 const Tour = require('../Model/tourModel');
-
+const APIFeatures = require('../Utility/apiFeatures'); //CLASS BASED Query
 //File handler
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // );
 
 //Route Handlers
+
+//Routre ALIASING-----------------------------------------------------
+
+//CHEAP
+exports.cheap5Tours = (req, res, next) => {
+  req.query.limit = '5'; //How many to display in a page
+  req.query.sort = '-ratingAverage,price'; //Keys to sort
+  req.query.feilds = 'name,ratingsAverage,summary,difficulty,price'; //Props to display
+  next();
+};
+
+//EASY TOURS
+exports.easyTours = (req, res, next) => {
+  req.query.sort = 'difficulty';
+  req.query.feilds = 'name, difficulty';
+  next();
+};
+
 //GET All-----------------------------------------------------
 exports.getAllTours = async (req, res) => {
   try {
-    //BUILD A SIMPLE QUERY
-    const queryObj = { ...req.query };
-    const removeProps = ['page', 'sort', 'limit', 'feilds'];
-    removeProps.forEach((props) => delete queryObj[props]);
-    //console.log(queryObj);
+    //BUILD A SIMPLE QUERY(Functional Approach)
+    // const queryObj = { ...req.query };
+    // const removeProps = ['page', 'sort', 'limit', 'feilds'];
+    // removeProps.forEach((props) => delete queryObj[props]);
+    // //console.log(queryObj);
 
-    //BUILD ADVANCE QUERY
-    let advQuery = JSON.stringify(queryObj);
-    advQuery = advQuery.replace(/\b(gte|lte|gt|lt)\b/g, (match) => `$${match}`);
-    const result = JSON.parse(advQuery);
+    // //BUILD ADVANCE QUERY
+    // let advQuery = JSON.stringify(queryObj);
+    // advQuery = advQuery.replace(/\b(gte|lte|gt|lt)\b/g, (match) => `$${match}`);
+    // const result = JSON.parse(advQuery);
 
-    //STORE QUERY
-    let query = Tour.find(result);
+    // //STORE QUERY
+    // let query = Tour.find(result);
 
     //CHECK FOR QUERY CHANGE
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
-    }
 
+    //SORT
+    // if (req.query.sort) {
+    //   const sortBy = req.query.sort.split(',').join(' ');
+    //   query = query.sort(sortBy);
+    // } else {
+    //   query = query.sort('-createdAt');
+    // }
+
+    //LIMIT FEILDS
+    // if (req.query.feilds) {
+    //   const feilds = req.query.feilds.split(',').join(' ');
+    //   //feilds = ['name', 'price','description',]
+    //   query = query.select(feilds);
+    // } else {
+    //   query = query.select('-__v');
+    // }
+
+    //PAGINATION
+
+    // const page = +req.query.page || 1;
+    // const limit = +req.query.limit || 10;
+    // const skip = (page - 1) * limit;
+    // //console.log(skip);
+
+    // query = query.skip(skip).limit(limit);
+
+    // if (req.query.page) {
+    //   const numDocs = await Tour.countDocuments();
+    //   if (skip >= numDocs) {
+    //     throw new Error('You have reached the end of the page');
+    //   }
+    // }
     //EXECUTE QUERY
-    const tours = await query;
+    const apiFeatures = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFeilds()
+      .paginate();
+
+    const tours = await apiFeatures.query;
 
     res.status(200).json({
       status: 'success',
