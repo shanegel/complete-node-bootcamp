@@ -1,5 +1,6 @@
 const Tour = require('../Model/tourModel');
 const APIFeatures = require('../Utility/apiFeatures'); //CLASS BASED Query
+const AppError = require('../Utility/appError');
 //File handler
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -99,22 +100,32 @@ exports.getAllTours = async (req, res) => {
   }
 };
 //GET Single tour-----------------------------------------------------
-exports.getSingleTour = async (req, res) => {
+exports.getSingleTour = async (req, res, next) => {
   try {
     const tour = await Tour.findById(req.params.id);
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour,
-      },
-    });
+    if (!tour) {
+      next(new AppError('No tour found with that ID', 404));
+    } else {
+      res.status(200).json({
+        status: 'success',
+        data: {
+          tour,
+        },
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: `ERR:: => GET FAIL:: => ${err}`,
+      message: `${new AppError('No tour found with that ID', 404)}`,
     });
   }
 };
+
+// const cathAsyncErr = (fn) => {
+//   return (req, res, next) => {
+//     fn(req, res, next).catch(next);
+//   };
+// };
 //POST-----------------------------------------------------
 exports.addTour = async (req, res) => {
   // const newTour = new Tour({});
@@ -135,6 +146,7 @@ exports.addTour = async (req, res) => {
     });
   }
 };
+
 //PATCH-----------------------------------------------------
 exports.editTour = async (req, res) => {
   try {
@@ -166,7 +178,7 @@ exports.deleteTour = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: `ERR:: => DELETE FAIL:: => ${err}`,
+      message: `${new AppError('No tour found with that ID', 404)}`,
     });
   }
 };

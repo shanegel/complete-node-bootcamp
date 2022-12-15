@@ -1,4 +1,6 @@
 const express = require('express');
+const AppError = require('./Utility/appError');
+const gblErrHandler = require('./Controllers/errorController');
 
 const app = express();
 
@@ -14,10 +16,19 @@ app.use('/api/v1/users', userRouter);
 
 //Check for non-existent end-points
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'FAIL',
-    message: `Cannot find (NON EXISTENT) ${req.originalUrl} end-pont in this API.`,
-  });
-  next();
+  // const err = new Error(
+  //   `Cannot find (NON EXISTENT) ${req.originalUrl} end-pont in this API.`
+  // );
+  // err.status = 'fail';
+  // err.statusCode = 404;
+  next(
+    new AppError(
+      `Cannot find (NON EXISTENT) ${req.originalUrl} end-pont in this API.`,
+      404
+    )
+  );
 });
+
+app.use(gblErrHandler);
+
 module.exports = app;
